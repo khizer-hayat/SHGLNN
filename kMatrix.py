@@ -78,10 +78,10 @@ def save_data_csv(K, nodes_list):
     for i, cols in enumerate(nodes_list):
         Kmatrix[f"{cols}"] = K[:, i].tolist()
 
-    graph_data = pd.DataFrame(Kmatrix)
+    kMatrix_data = pd.DataFrame(Kmatrix)
     drop_col = graph_data.columns.tolist()[0]
-    graph_data = graph_data.drop(drop_col, axis=1)
-    graph_data.to_csv("grah_data.csv", sep=',')
+    kMatrix_data = kMatrix_data.drop(drop_col, axis=1)
+    kMatrix_data.to_csv("kMatrix_data.csv", sep=',')
 
 def generate_k_matrix(initial_k_matrix,
                      unique_nodes,
