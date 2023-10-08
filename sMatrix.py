@@ -55,5 +55,5 @@ if __name__ == "__main__":
     save_dir = args.save
     print('Generating S matrix...')
     S_matrix = generate_s_matrix(name, save_dir)
-    np.savetxt(f'{name}_s_matrix.csv', S_matrix, delimiter=',')
+    np.savetxt(f'{name}_sMatrix_data.csv', S_matrix, delimiter=',')
     print('done!!!')
