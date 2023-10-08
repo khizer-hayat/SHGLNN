@@ -83,7 +83,7 @@ def save_data_csv(K, nodes_list):
     graph_data = graph_data.drop(drop_col, axis=1)
     graph_data.to_csv("grah_data.csv", sep=',')
 
-def generate_kmatrix(initial_k_matrix,
+def generate_k_matrix(initial_k_matrix,
                      unique_nodes,
                      spl,
                      k_hops = None):
@@ -109,6 +109,6 @@ if __name__ == "__main__":
     first_graph = data[args.graph_index]
     src_nodes, target_nodes = get_src_target_nodes(first_graph)
     spl, kmatrix, unique_nodes = create_graph(first_graph, src_nodes, target_nodes)
-    kmatrix = generate_kmatrix(kmatrix, unique_nodes, spl, args.khops)
+    kmatrix = generate_k_matrix(kmatrix, unique_nodes, spl, args.khops)
     print(f"K matrix generated: \n{kmatrix}")
     print(f'K matrix shape: {kmatrix.shape}')
