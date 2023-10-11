@@ -1,29 +1,36 @@
-import torch
-import torch_geometric
-from torch_geometric.datasets import TUDataset
+import torch.optim as optim
 from model import SHGLNN
+from dataset_loader import CustomDatasetLoader
 
-# Load data (for now MUTAG as an example)
-dataset_name = 'MUTAG'
-dataset = TUDataset(root=f"../datasets/{dataset_name}", name=dataset_name)
-data = dataset[0]  # Using only one graph for simplicity
+def contrastive_loss(output_original, output_augmented, temperature=0.5):
+    numerator = torch.exp(F.cosine_similarity(output_original, output_augmented) / temperature)
+    denominator = numerator + torch.sum(torch.exp(output_original.mm(output_augmented.T) / temperature))
+    loss = -torch.log(numerator / denominator)
+    return loss
 
-# Hyperparameters
-input_dim = data.num_node_features
-hidden_dim = 128
-output_dim = dataset.num_classes
-learning_rate = 0.005
+def train(model, data_loader, optimizer):
+    model.train()
+    total_loss = 0
+    for data in data_loader:
+        optimizer.zero_grad()
+        outputs_original = model(data.nodes, data.edges, data.hyperedge_weights, data.D_v_inv, data.D_e_inv, data.E_intra, data.E_inter)
+        outputs_augmented = model(data.nodes_augmented, data.edges_augmented, data.hyperedge_weights_augmented, data.D_v_inv, data.D_e_inv, data.E_intra, data.E_inter)
+        loss = contrastive_loss(outputs_original, outputs_augmented)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    return total_loss / len(data_loader)
 
-# Initialize model and optimizer
-model = SHGLNN(input_dim, hidden_dim, output_dim)
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-loss_function = nn.CrossEntropyLoss()
+# Define model, optimizer, and other configurations
+model = SHGLNN(128, 256)
+optimizer = optim.Adam(model.parameters(), lr=0.005)
 
-# Sample training loop
-for epoch in range(100):  # Placeholder epoch value
-    optimizer.zero_grad()
-    out = model(data.x, data.edge_index, hyperedge_weights)  # Placeholder hyperedge_weights
-    loss = loss_function(out, data.y)
-    loss.backward()
-    optimizer.step()
-    print(f"Epoch {epoch + 1}, Loss: {loss.item()}")
+# Load dataset
+name = 'MUTAG'
+dataset_loader = CustomDatasetLoader(name, f"../datasets/{name}")
+data_loader = dataset_loader.get_dataloader()
+
+# train the model
+for epoch in range(250):
+    loss = train(model, data_loader, optimizer)
+    print(f"Epoch {epoch+1}, Loss: {loss:.4f}")
