@@ -6,4 +6,5 @@
 - **sMatrix.py:** S matrix generation for inter-graph hyperedges.
 - **hyperGen.py:** Hypergraph generation using K and S matrices.
 - **layers.py:** Includes the nodeConv, hyperConv, and pooling layers of the model.
-- **train.py:** Basic model training.
+- **model.py:** the model SHGLNN.
+- **train.py:** Model training.
