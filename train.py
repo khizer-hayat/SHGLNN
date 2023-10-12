@@ -22,9 +22,9 @@ def train_and_evaluate(dataset_name):
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     # Split the dataset
-    train_dataset = dataset[:int(0.7 * len(dataset))]
-    val_dataset = dataset[int(0.7 * len(dataset)):int(0.85 * len(dataset))]
-    test_dataset = dataset[int(0.85 * len(dataset)):]
+    train_dataset = dataset[:int(0.3 * len(dataset))]
+    val_dataset = dataset[int(0.3 * len(dataset)):int(0.4 * len(dataset))]
+    test_dataset = dataset[int(0.4 * len(dataset)):]
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
