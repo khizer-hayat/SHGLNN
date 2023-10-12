@@ -1,79 +1,112 @@
 import torch
-import torch.nn.functional as F
 from torch_geometric.data import DataLoader
-from sklearn.metrics import f1_score, accuracy_score
-import numpy as np
-
+from torch_geometric.datasets import TUDataset
+from sklearn.metrics import f1_score
 from model import SHGLNN
-from layers import NodeConv, HyperedgeConv, Attention
-from dataset_loader import GraphDataset
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hyperparameters and settings
 EPOCHS = 250
 BATCH_SIZE = 32
 LEARNING_RATE = 0.005
-DATASETS = ['MUTAG', 'NCI1', 'PROTEINS', 'ENZYMES', 'IMDB-BINARY', 'COLLAB']
 NUM_RUNS = 10
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+criterion = torch.nn.CrossEntropyLoss()
 
-def train_one_epoch(model, loader, optimizer):
-    model.train()
-
-    total_loss = 0
-    for data in loader:
-        optimizer.zero_grad()
-        out1, out2 = model(data)
-        loss = model.compute_loss(out1, out2)
-        loss.backward()
-        optimizer.step()
-
-        total_loss += loss.item()
-    return total_loss / len(loader)
-
-def evaluate(model, loader):
-    model.eval()
-    all_preds = []
-    all_labels = []
-
-    with torch.no_grad():
-        for data in loader:
-            out1, _ = model(data)
-            pred = out1.argmax(dim=1)
-            all_preds.extend(pred.cpu().numpy())
-            all_labels.extend(data.y.cpu().numpy())
-
-    accuracy = accuracy_score(all_labels, all_preds)
-    f1 = f1_score(all_labels, all_preds, average='weighted')
+def train_and_evaluate(dataset_name):
+    dataset = TUDataset(root='./data', name=dataset_name)
     
-    return accuracy, f1
+    # Instantiate the model
+    model = SHGLNN(in_channels=dataset.num_node_features, hidden_channels=256, out_channels=dataset.num_classes).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-def main():
-    for dataset_name in DATASETS:
-        accuracies = []
-        f1_scores = []
-        losses = []
+    # Split the dataset
+    train_dataset = dataset[:int(0.7 * len(dataset))]
+    val_dataset = dataset[int(0.7 * len(dataset)):int(0.85 * len(dataset))]
+    test_dataset = dataset[int(0.85 * len(dataset)):]
 
-        for _ in range(NUM_RUNS):
-            dataset = GraphDataset(name=dataset_name)
-            loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE)
 
-            model = SHGLNN().to(device)
-            optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    for run in range(NUM_RUNS):
+        for epoch in range(EPOCHS):
+            # --------- Training ---------
+            model.train()
+            train_loss = 0
+            train_correct = 0
+            train_total = 0
+            train_predictions = []
+            train_labels = []
 
-            for epoch in range(EPOCHS):
-                loss = train_one_epoch(model, loader, optimizer)
+            for batch in train_loader:
+                optimizer.zero_grad()
+                data = batch.to(device)
+                outputs = model(data)
+                loss = criterion(outputs, data.y)
+                loss.backward()
+                optimizer.step()
 
-            accuracy, f1 = evaluate(model, loader)
-            accuracies.append(accuracy)
-            f1_scores.append(f1)
-            losses.append(loss)
+                train_loss += loss.item()
+                _, predicted = torch.max(outputs, 1)
+                train_total += data.y.size(0)
+                train_correct += (predicted == data.y).sum().item()
+                train_predictions.extend(predicted.cpu().numpy())
+                train_labels.extend(data.y.cpu().numpy())
 
-        print(f"Dataset: {dataset_name}")
-        print(f"Accuracy: {np.mean(accuracies):.4f} +/- {np.std(accuracies):.4f}")
-        print(f"F1-Score: {np.mean(f1_scores):.4f} +/- {np.std(f1_scores):.4f}")
-        print(f"Loss: {np.mean(losses):.4f} +/- {np.std(losses):.4f}")
-        print("-------------------------------------------------")
+            train_accuracy = 100 * train_correct / train_total
+            train_f1 = f1_score(train_labels, train_predictions, average='weighted')
+            print(f'Epoch [{epoch+1}/{EPOCHS}], Loss: {train_loss/len(train_loader):.4f}, Train Accuracy: {train_accuracy:.2f} %, Train F1: {train_f1:.4f}')
+
+            # --------- Validation ---------
+            model.eval()
+            val_loss = 0
+            val_correct = 0
+            val_total = 0
+            val_predictions = []
+            val_labels = []
+            
+            for data in val_loader:
+                data = data.to(device)
+                outputs = model(data)
+                loss = criterion(outputs, data.y)
+                val_loss += loss.item()
+                _, predicted = torch.max(outputs, 1)
+                val_total += data.y.size(0)
+                val_correct += (predicted == data.y).sum().item()
+                val_predictions.extend(predicted.cpu().numpy())
+                val_labels.extend(data.y.cpu().numpy())
+
+            val_accuracy = 100 * val_correct / val_total
+            val_f1 = f1_score(val_labels, val_predictions, average='weighted')
+            print(f'Run [{run+1}/{NUM_RUNS}], Epoch [{epoch+1}/{EPOCHS}], Loss: {loss.item():.4f}, Validation Loss: {val_loss/len(val_loader):.4f}, Validation Accuracy: {val_accuracy:.2f} %, Validation F1: {val_f1:.4f}')
+
+        # --------- Testing ---------
+        test_loss = 0
+        test_correct = 0
+        test_total = 0
+        test_predictions = []
+        test_labels = []
+        with torch.no_grad():
+            for data in test_loader:
+                data = data.to(device)
+                outputs = model(data)
+                loss = criterion(outputs, data.y)
+                test_loss += loss.item()
+                _, predicted = torch.max(outputs, 1)
+                test_total += data.y.size(0)
+                test_correct += (predicted == data.y).sum().item()
+                test_predictions.extend(predicted.cpu().numpy())
+                test_labels.extend(data.y.cpu().numpy())
+
+        test_accuracy = 100 * test_correct / test_total
+        test_f1 = f1_score(test_labels, test_predictions, average='weighted')
+        print(f'Run [{run+1}/{NUM_RUNS}], Testing Loss: {test_loss/len(test_loader):.4f}, Testing Accuracy: {test_accuracy:.2f} %, Testing F1: {test_f1:.4f}')
 
 if __name__ == "__main__":
-    main()
+    dataset_names = ['MUTAG', 'NCI1', 'PROTEINS', 'ENZYMES', 'IMDB-BINARY', 'COLLAB']
+
+    for dataset_name in dataset_names:
+        print(f"\nTraining for {dataset_name}")
+        train_and_evaluate(dataset_name)
