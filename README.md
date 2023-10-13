@@ -47,7 +47,7 @@ Pull requests are welcome. For major changes or any issues, please open an issue
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ## Citation
-
+If you use this work, please cite the following:
 ```
 @inproceedings{hayatSHGLNN2023, 
     author = {Hayat, Malik Khizar, Xue, Shan and Yang, Jian},
