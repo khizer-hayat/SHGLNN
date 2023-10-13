@@ -31,12 +31,12 @@ See Algorithm 1 in our paper for a detailed step-by-step explanation.
 2. Install the required packages:
 `pip install numpy networkx hypernetx`
 3. Generate the matrices K and S for intra- and inter-graph hyperedges
-4.     Note that for all datasets, multiple K matrices would be generated as we go through different values of K. However, we will generate a single S matrix for each dataset.
+   Note that for all datasets, multiple K matrices would be generated as we go through different values of K. However, we will generate a single S matrix for each dataset.
 5. Generate hypergraph using `hypergraphGen.py`
 6. Develop layers using `layers.py`
 7. Run the `model.py` to develop the model
 8. Then, train the model using `train.py`
-9.     Note that for datasets, we used the built-in TU dataset from PyTorch Geometric
+   Note that for datasets, we used the built-in TU dataset from PyTorch Geometric
 
 ## Note
 Ensure your dataset is structured correctly for dataset_loader.py. For more specific instructions, see the comments in the file.
