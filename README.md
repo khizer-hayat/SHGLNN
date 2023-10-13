@@ -45,13 +45,12 @@ Pull requests are welcome. For major changes, or any issue, please open an issue
 ## Citation
 
 ```
-    @inproceedings{liu2022DAGAD, 
-	    author = {Liu, Fanzhen and Ma, Xiaoxiao and Wu, Jia and Yang, Jian and Xue, Shan and Beheshti, Amin and  
-                      Zhou, Chuan and Peng, Hao and Sheng, Quan Z. and Aggarwal, Charu C.},
-	    title = {DAGAD: Data augmentation for graph anomaly detection},
-	    booktitle = {ICDM},
-	    year = {2022},
-	    pages={259-268},
-	    doi={10.1109/ICDM54844.2022.00036},
-    }
+@inproceedings{hayatSHGLNN2023, 
+    author = {Hayat, Malik Khizar, Xue, Shan and Yang, Jian},
+    title = {Self-supervised Heterogeneous Hypergraph Learning with Context-aware Pooling for Graph-level Classification},
+    booktitle = {ICDM},
+    year = {2023},
+    pages=---,
+    doi={---},
+}
 ```
