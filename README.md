@@ -38,9 +38,6 @@ See Algorithm 1 in our paper for a detailed step-by-step explanation.
 8. Then, train the model using `train.py`
    - Note that for datasets, we used the built-in TU dataset from PyTorch Geometric
 
-## Note
-Ensure your dataset is structured correctly for dataset_loader.py. For more specific instructions, see the comments in the file.
-
 ## Contribution
 Pull requests are welcome. For major changes, or any issue, please open an issue first to discuss what you would like to discuss.
 
