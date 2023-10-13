@@ -24,6 +24,8 @@ See Algorithm 1 in our paper for a detailed step-by-step explanation.
 - NetworkX 3.1
 - HypernetX 2.0.5
 
+## Datasets
+We use the TUDatasets mentioned in the paper from PyTorch Geometric TUDatasets (https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.datasets.TUDataset.html#torch_geometric.datasets.TUDataset)
 ## Usage
 1. Clone the repository
 `git clone https://github.com/YOUR_USERNAME/SHGLNN.git`
@@ -39,7 +41,7 @@ See Algorithm 1 in our paper for a detailed step-by-step explanation.
    - Note that for datasets, we used the built-in TU dataset from PyTorch Geometric
 
 ## Contribution
-Pull requests are welcome. For major changes, or any issue, please open an issue first to discuss what you would like to discuss.
+Pull requests are welcome. For major changes or any issues, please open an issue first for discussion. For further inquiries, contact the first author at malik.khizar@hdr.mq.edu.au or khizerhayat92@gmail.com.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
