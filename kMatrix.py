@@ -8,7 +8,7 @@
 import pandas as pd
 import numpy as np
 import torch_geometric
-from get_dataset import Dataset
+from dataset_loader import CustomDatasetLoader
 import networkx as nx
 import argparse
 
@@ -104,8 +104,8 @@ def generate_k_matrix(initial_k_matrix,
 if __name__ == "__main__":
     args = read_args()
     NAME = args.name.upper()
-    dataset = Dataset(f"{NAME}", save_dir= f"../datasets/{NAME}")
-    data = dataset.return_dataset()
+    loader = CustomDatasetLoader(f"{NAME}", save_dir= f"../datasets/{NAME}")
+    data = loader.load_dataset()
     first_graph = data[args.graph_index]
     src_nodes, target_nodes = get_src_target_nodes(first_graph)
     spl, kmatrix, unique_nodes = create_graph(first_graph, src_nodes, target_nodes)
