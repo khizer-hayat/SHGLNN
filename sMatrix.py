@@ -1,6 +1,6 @@
 import torch_geometric
 import numpy as np
-from t_nodes_graph import total_nodes_in_a_graph
+from dataset_loader import CustomDatasetLoader
 import argparse
 
 def read_args():
@@ -22,7 +22,8 @@ def generate_s_matrix(name, save):
     S matrix of size (num_nodes, num_nodes) while
     num_nodes are the total nodes in the dataset
     """
-    nodes, data = total_nodes_in_a_graph(dataset_name= name, save_dir = save)
+    loader = CustomDatasetLoader(name=name, save_dir=save)
+    nodes, data = loader.total_nodes_in_a_graph()  # Get total nodes and dataset
     S_matrix = np.zeros((nodes, nodes))
     height, width = 0, 0
     for i in range(len(data)):
