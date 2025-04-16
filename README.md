@@ -54,7 +54,7 @@ If you use this work, please cite the following:
     title = {Self-supervised Heterogeneous Hypergraph Learning with Context-aware Pooling for Graph-level Classification},
     booktitle = {ICDM},
     year = {2023},
-    pages=---,
-    doi={---},
+    pages={140-149},
+    doi={10.1109/ICDM58522.2023.00023}
 }
 ```
